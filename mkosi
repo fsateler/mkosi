@@ -451,23 +451,28 @@ def install_fedora(args, workspace, run_build_script):
     print_step("Installing Fedora completed.")
 
 def install_debian_or_ubuntu(args, workspace, run_build_script, mirror):
+    packages = ['systemd']
+
+    if args.release != 'jessie':
+        packages += ['usrmerge']
+
+    if not args.packages is None:
+        pakages += args.packages
+
+    if run_build_script and not args.build_packages is None:
+        packages += args.build_packages
+
+    if args.bootable and args.output_format == OutputFormat.raw_btrfs:
+        packages += ['btrfs-tools']
+
     cmdline = ["debootstrap",
                "--verbose",
                "--variant=minbase",
-               "--include=systemd,usrmerge",
+               "--include=" + ",".join(packages),
                "--exclude=sysv-rc,initscripts,startpar,lsb-base,insserv",
                args.release,
                workspace + "/root",
                mirror]
-
-    if not args.packages is None:
-        cmdline[3] += "," + ",".join(args.packages)
-
-    if run_build_script and not args.build_packages is None:
-        cmdline[3] += "," + ",".join(args.build_packages)
-
-    if args.bootable and args.output_format == OutputFormat.raw_btrfs:
-        cmdline[3] += ",btrfs-tools"
 
     subprocess.run(cmdline, check=True)
 
