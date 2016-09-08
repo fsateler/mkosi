@@ -1288,6 +1288,10 @@ def load_args():
             sys.stderr.write("Bootable images are currently supported only on Debian, Fedora and ArchLinux.\n")
             sys.exit(1)
 
+        if args.distribution == Distribution.debian and args.release == 'jessie':
+            sys.stderr.write("Bootable images for jessie are not supported.\n")
+            sys.exit(1)
+
         if not args.output_format in (OutputFormat.raw_gpt, OutputFormat.raw_btrfs):
             sys.stderr.write("Directory, subvolume and tar images cannot be booted.\n")
             sys.exit(1)
